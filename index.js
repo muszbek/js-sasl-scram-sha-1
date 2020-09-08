@@ -104,13 +104,19 @@ RESP.challenge = function (mech, cred) {
         clientKey: clientKey,
         serverKey: serverKey
     };
-
+    
     return result;
 };
 
-RESP.final = function () {
+RESP.final = function (mech, _cred) {
     // TODO: Signal errors
-    return '';
+    var serverSign = new Buffer(mech._serverSignature).toString('base64');
+    var verifier = mech._verifier;
+    if (verifier == serverSign) {
+	return "authenticated";
+    } else {
+	return "server signature mismatch";
+    }
 };
 
 
