@@ -21,7 +21,11 @@ Mechanism.prototype.clientFirst = true;
 
 
 Mechanism.prototype.response = function (cred) {
-    return RESP[this._stage](this, cred);
+    if (this._error == undefined) {
+	return RESP[this._stage](this, cred);
+    } else {
+	throw this._error;
+    }
 };
 
 Mechanism.prototype.challenge = function (chal) {
@@ -109,13 +113,13 @@ RESP.challenge = function (mech, cred) {
 };
 
 RESP.final = function (mech, _cred) {
-    // TODO: Signal errors
     var serverSign = new Buffer(mech._serverSignature).toString('base64');
     var verifier = mech._verifier;
+    
     if (verifier == serverSign) {
 	return "authenticated";
     } else {
-	return "server signature mismatch";
+	throw "server_signature_mismatch";
     }
 };
 
